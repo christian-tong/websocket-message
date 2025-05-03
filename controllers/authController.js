@@ -1,21 +1,4 @@
-const { register, login } = require("../services/authService");
-
-const registerUser = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: "Faltan credenciales" });
-    }
-    const result = await register(username, password);
-    res
-      .status(201)
-      .json({ message: "Usuario registrado exitosamente", data: result });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Error al registrar el usuario", details: error.message });
-  }
-};
+const { login } = require("../services/authService");
 
 const loginUser = async (req, res) => {
   try {
@@ -23,11 +6,11 @@ const loginUser = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({ error: "Faltan credenciales" });
     }
-    const result = await login(username, password);
-    res.status(200).json({ message: "Autenticación correcta", data: result });
+    const { token } = await login(username, password); // Llama al servicio de login
+    res.status(200).json({ message: "Autenticación correcta", token });
   } catch (error) {
-    res.status(401).json({ error: "Credenciales incorrectas" });
+    res.status(401).json({ error: error.message });
   }
 };
 
-module.exports = { registerUser, loginUser };
+module.exports = { loginUser }; // Correctamente exportamos loginUser

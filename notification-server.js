@@ -1,14 +1,16 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const cors = require("cors");
-const { v4: uuidv4 } = require("uuid");
-const sqlite3 = require("sqlite3").verbose();
-const path = require("path");
+const { createTables } = require("./config/dbConfig");
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+
+// Llamar a la función que crea las tablas si no existen
+createTables();
 
 // Configuración de SQLite
 const db = new sqlite3.Database(
