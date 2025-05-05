@@ -3,15 +3,15 @@ require("dotenv").config();
 
 // Configuración de la base de datos
 const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true, // Esperar a que haya una conexión disponible si todas están ocupadas
-  connectionLimit: 10, // Número máximo de conexiones en el pool
-  queueLimit: 0, // Número máximo de conexiones en espera
+  host: process.env.DB_HOST, // El host de la base de datos proporcionado por Railway
+  user: process.env.DB_USER, // Usuario de la base de datos
+  password: process.env.DB_PASSWORD, // Contraseña de la base de datos
+  database: process.env.DB_NAME, // Nombre de la base de datos
+  port: process.env.DB_PORT || 3306, // Usar el puerto de la base de datos, 3306 por defecto
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 };
-
 const pool = mysql.createPool(dbConfig);
 
 // Función para obtener una conexión desde el pool

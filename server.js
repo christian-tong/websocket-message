@@ -8,8 +8,11 @@ const { createTables } = require("./config/dbConfig");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const allowedOrigins = require("./corsConfig");
+require("dotenv").config();
 
 const app = express();
+
+const PORT = process.env.PORT || 3001; 
 
 // Configuración CORS
 app.use(
@@ -47,7 +50,7 @@ app.use("/api/auth", authRoutes);
 app.use(notificationRoutes);
 
 // Iniciar el servidor
-httpServer.listen(3001, () => {
+httpServer.listen(PORT, () => {
   console.log("Servidor corriendo en el puerto 3001");
 });
 
