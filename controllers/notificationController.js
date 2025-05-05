@@ -1,6 +1,5 @@
 // notificationController.js
 const { v4: uuidv4 } = require("uuid");
-const { io } = require("../server"); // Importamos 'io' desde el archivo 'server.js'
 const { getConnection } = require("../config/dbConfig");
 
 // Obtener todas las notificaciones

@@ -1,6 +1,12 @@
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
+console.log(process.env.DB_HOST);
+console.log(process.env.DB_USER);
+console.log(process.env.DB_PASSWORD);
+console.log(process.env.DB_NAME);
+console.log(process.env.DB_PORT);
+
 // Configuración de la base de datos
 const dbConfig = {
   host: process.env.DB_HOST, // El host de la base de datos proporcionado por Railway
@@ -8,9 +14,6 @@ const dbConfig = {
   password: process.env.DB_PASSWORD, // Contraseña de la base de datos
   database: process.env.DB_NAME, // Nombre de la base de datos
   port: process.env.DB_PORT || 3306, // Usar el puerto de la base de datos, 3306 por defecto
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
 };
 const pool = mysql.createPool(dbConfig);
 
@@ -24,41 +27,4 @@ const getConnection = async () => {
   }
 };
 
-// Crear tablas si no existen (función para inicialización)
-const createTables = async () => {
-  const connection = await getConnection(); // Usamos el pool para obtener una conexión
-
-  const createUsersTable = `
-    CREATE TABLE IF NOT EXISTS users (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      username VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
-
-  const createNotificationsTable = `
-    CREATE TABLE IF NOT EXISTS notifications (
-      id VARCHAR(36) PRIMARY KEY, 
-      message TEXT,
-      data TEXT,
-      reserva TEXT,
-      status TEXT,
-      timestamp TEXT,
-      created_at TEXT,
-      updated_at TEXT
-    )
-  `;
-
-  try {
-    await connection.execute(createUsersTable); // Creación de la tabla de usuarios
-    await connection.execute(createNotificationsTable); // Creación de la tabla de notificaciones
-    console.log("Tablas creadas o verificadas correctamente.");
-  } catch (error) {
-    console.error("Error creando las tablas:", error);
-  } finally {
-    connection.release(); // Liberar la conexión del pool
-  }
-};
-
-module.exports = { getConnection, createTables };
+module.exports = { getConnection };

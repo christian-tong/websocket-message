@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { loginUser } = require("../controllers/authController"); // Asegúrate de que esta importación sea correcta
+const { loginUser, registerUser } = require("../controllers/authController"); // Importamos las funciones
 
-router.post("/login", loginUser); // Esta ruta debe estar asociada al controlador loginUser
+// Ruta para el login
+router.post("/login", loginUser);
+
+// Ruta para el registro
+router.post("/register", registerUser); // Nueva ruta para registrar usuarios
 
 module.exports = router;

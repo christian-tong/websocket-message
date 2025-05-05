@@ -4,7 +4,6 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const { createTables } = require("./config/dbConfig");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const allowedOrigins = require("./corsConfig");
@@ -12,7 +11,7 @@ require("dotenv").config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000;
 
 // Configuración CORS
 app.use(
@@ -23,9 +22,6 @@ app.use(
   })
 );
 app.use(bodyParser.json());
-
-// Llamada para crear las tablas en la base de datos
-// createTables();
 
 // Configuración de Socket.io
 const httpServer = createServer(app);
@@ -51,8 +47,5 @@ app.use(notificationRoutes);
 
 // Iniciar el servidor
 httpServer.listen(PORT, () => {
-  console.log("Servidor corriendo en el puerto 3000");
+  console.log("Servidor corriendo en el puerto", PORT);
 });
-
-// Exportar 'io' para que pueda ser utilizado en otros archivos
-// module.exports = { io };
