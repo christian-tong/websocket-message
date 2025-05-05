@@ -25,7 +25,7 @@ app.use(
 app.use(bodyParser.json());
 
 // Llamada para crear las tablas en la base de datos
-createTables();
+// createTables();
 
 // Configuración de Socket.io
 const httpServer = createServer(app);
@@ -55,4 +55,4 @@ httpServer.listen(PORT, () => {
 });
 
 // Exportar 'io' para que pueda ser utilizado en otros archivos
-module.exports = { io };
+// module.exports = { io };
