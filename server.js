@@ -12,7 +12,7 @@ require("dotenv").config();
 
 const app = express();
 
-const PORT = process.env.PORT || 3001; 
+const PORT = process.env.PORT || 3000; 
 
 // Configuración CORS
 app.use(
@@ -51,7 +51,7 @@ app.use(notificationRoutes);
 
 // Iniciar el servidor
 httpServer.listen(PORT, () => {
-  console.log("Servidor corriendo en el puerto 3001");
+  console.log("Servidor corriendo en el puerto 3000");
 });
 
 // Exportar 'io' para que pueda ser utilizado en otros archivos
