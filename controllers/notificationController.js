@@ -1,6 +1,8 @@
 // notificationController.js
 const { v4: uuidv4 } = require("uuid");
 const { getConnection } = require("../config/dbConfig");
+const { io } = require("../socket-io/socketIo");
+const getFormattedTimestamp = require("../utils/formatDate");
 
 // Obtener todas las notificaciones
 const getNotifications = async (req, res) => {
@@ -28,7 +30,7 @@ const getNotifications = async (req, res) => {
 // Crear una nueva notificación
 const createNotification = async (req, res) => {
   const { message, data, reserva } = req.body;
-  const timestamp = new Date().toISOString();
+  const timestamp = getFormattedTimestamp();
   const id = uuidv4(); // Genera un nuevo UUID
 
   try {
@@ -59,6 +61,8 @@ const createNotification = async (req, res) => {
       created_at: timestamp,
       updated_at: timestamp,
     };
+
+    io.emit("newNotification", newNotification);
 
     res.status(201).json(newNotification);
   } catch (err) {

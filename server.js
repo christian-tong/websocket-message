@@ -1,15 +1,12 @@
 // server.js
-const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { createServer } = require("http");
-const { Server } = require("socket.io");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const allowedOrigins = require("./corsConfig");
+const { io, app, httpServer } = require("./socket-io/socketIo");
 require("dotenv").config();
-
-const app = express();
 
 const PORT = process.env.PORT || 3000;
 
@@ -22,16 +19,6 @@ app.use(
   })
 );
 app.use(bodyParser.json());
-
-// Configuración de Socket.io
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PATCH"],
-    credentials: true,
-  },
-});
 
 // Conexión de cliente Socket.io
 io.on("connection", (socket) => {
