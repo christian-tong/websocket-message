@@ -1,7 +1,8 @@
-// Definir las rutas permitidas para CORS
+require("dotenv").config();
+
 const allowedOrigins = [
-    "http://localhost:5173", 
-    "http://localhost:3000", 
+  process.env.MODA_URL, 
+  process.env.NOTIFICATION_URL, 
 
   ];
   
