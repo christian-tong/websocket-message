@@ -45,7 +45,7 @@ const login = async (username, password) => {
 
   // Generar un token
   const token = generateToken(id);
-  return { token };
+  return { token, userId: id };
 };
 
 const verifyToken = (token) => {

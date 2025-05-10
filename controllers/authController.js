@@ -1,4 +1,5 @@
 const { login, register } = require("../services/authService");
+const { io, activeConnections } = require("../socket-io/socketIo");
 
 // Controlador para el registro de usuario
 const registerUser = async (req, res) => {
@@ -31,7 +32,13 @@ const loginUser = async (req, res) => {
     if (!username || !password) {
       return res.status(400).json({ error: "Faltan credenciales" });
     }
-    const { token } = await login(username, password); // Llama al servicio de login
+
+    const { token, userId } = await login(username, password);
+
+    if (activeConnections.has(userId)) {
+      activeConnections.get(userId).disconnect(true);
+    }
+
     res.status(200).json({ message: "Autenticación correcta", token });
   } catch (error) {
     res.status(401).json({ error: error.message });
