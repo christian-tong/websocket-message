@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node ./server.js",
+    "pm2": "pm2 start server.js --name 'websocket-message' --watch"
   },
   "keywords": [],
   "author": "",
@@ -22,5 +23,8 @@
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "pm2": "^6.0.5"
   }
 }

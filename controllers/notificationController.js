@@ -97,6 +97,8 @@ const updateNotification = async (req, res) => {
       reserva: JSON.parse(rows[0].reserva),
     };
 
+     io.emit("notificationUpdated", updatedNotification);
+
     res.json(updatedNotification);
   } catch (err) {
     console.error("Database error:", err);

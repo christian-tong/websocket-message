@@ -5,7 +5,13 @@ const { createServer } = require("http");
 const authRoutes = require("./routes/authRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const allowedOrigins = require("./corsConfig");
-const { io, app, httpServer } = require("./socket-io/socketIo");
+const {
+  io,
+  app,
+  httpServer,
+  activeConnections,
+} = require("./socket-io/socketIo");  // Asegúrate de importar correctamente
+
 require("dotenv").config();
 
 const PORT = process.env.PORT || 3000;
@@ -20,12 +26,10 @@ app.use(
 );
 app.use(bodyParser.json());
 
-// Conexión de cliente Socket.io
-io.on("connection", (socket) => {
-  console.log("Cliente conectado");
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado");
-  });
+// Manejo de errores global
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ error: "Algo salió mal en el servidor" });
 });
 
 // Rutas de autenticación y notificaciones

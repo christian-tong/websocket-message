@@ -27,15 +27,16 @@ const register = async (username, password) => {
 const login = async (username, password) => {
   const connection = await getConnection();
 
-  // Obtener la contraseña hasheada de la base de datos
-  const query = "SELECT id, password FROM users WHERE username = ? LIMIT 1";
+  // Obtener la contraseña hasheada y el username de la base de datos
+  const query =
+    "SELECT id, username, password FROM users WHERE username = ? LIMIT 1";
   const [rows] = await connection.execute(query, [username]);
 
   if (rows.length === 0) {
     throw new Error("Usuario no encontrado");
   }
 
-  const { id, password: passwordHash } = rows[0];
+  const { id, username: userNameFromDb, password: passwordHash } = rows[0];
 
   // Verificar la contraseña
   const isValid = verifyPassword(password, passwordHash);
@@ -45,7 +46,7 @@ const login = async (username, password) => {
 
   // Generar un token
   const token = generateToken(id);
-  return { token, userId: id };
+  return { token, userId: id, username: userNameFromDb }; // Ahora devuelve también el username
 };
 
 const verifyToken = (token) => {

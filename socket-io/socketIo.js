@@ -1,3 +1,4 @@
+// socket.js
 const { Server } = require("socket.io");
 const express = require("express");
 const { createServer } = require("http");
@@ -22,15 +23,13 @@ const io = new Server(httpServer, {
 io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
-
     if (!token) {
       throw new Error("Token no proporcionado");
     }
 
     // Verificar el token JWT
     const decoded = verifyToken(token);
-    socket.userId = decoded.userId; // Adjuntar el ID de usuario al socket
-
+    socket.userId = decoded.userId;
     next();
   } catch (error) {
     console.error("Error de autenticación:", error.message);
@@ -43,16 +42,20 @@ io.on("connection", (socket) => {
 
   console.log(`Nueva conexión para usuario: ${userId}`);
 
-  // Si el usuario ya tiene una conexión activa
+  // Verifica si el usuario ya tiene una conexión activa
   if (activeConnections.has(userId)) {
     const previousSocket = activeConnections.get(userId);
-    console.log(`Desconectando sesión previa para usuario: ${userId}`);
 
-    // Desconectar el socket anterior
-    previousSocket.disconnect(true);
-
-    // Enviar evento de desconexión al cliente anterior
-    previousSocket.emit("force_disconnect", "Nueva sesión detectada");
+    // Evitar la desconexión de una sesión previa si ya se está desconectando
+    if (previousSocket.disconnected) {
+      console.log(
+        `La sesión anterior ya está desconectada para el usuario: ${userId}`
+      );
+    } else {
+      console.log(`Desconectando sesión previa para usuario: ${userId}`);
+      previousSocket.disconnect(true);
+      previousSocket.emit("force_disconnect", "Nueva sesión detectada");
+    }
   }
 
   // Almacenar la nueva conexión

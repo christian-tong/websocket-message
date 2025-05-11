@@ -33,13 +33,21 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: "Faltan credenciales" });
     }
 
-    const { token, userId } = await login(username, password);
+    const {
+      token,
+      userId,
+      username: userNameFromDb,
+    } = await login(username, password);
 
     if (activeConnections.has(userId)) {
       activeConnections.get(userId).disconnect(true);
     }
 
-    res.status(200).json({ message: "Autenticación correcta", token });
+    res.status(200).json({
+      message: "Autenticación correcta",
+      token,
+      username: userNameFromDb,
+    });
   } catch (error) {
     res.status(401).json({ error: error.message });
   }
