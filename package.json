@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node ./server.js",
-    "pm2": "pm2 start server.js --name 'websocket-message' --watch"
+    "start": "pm2 start server.js --name 'websocket-message' --watch",
+    "start-dev": "node ./server.js"
   },
   "keywords": [],
   "author": "",

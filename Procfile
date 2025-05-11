@@ -1,0 +1,1 @@
+web: pm2 start server.js --name "websocket-message" --watch
