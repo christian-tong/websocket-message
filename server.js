@@ -36,6 +36,10 @@ app.use((err, req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use(notificationRoutes);
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Iniciar el servidor
 httpServer.listen(PORT, () => {
   console.log("Servidor corriendo en el puerto", PORT);
