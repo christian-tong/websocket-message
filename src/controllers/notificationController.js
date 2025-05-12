@@ -1,4 +1,4 @@
-// notificationController.js
+//./src/controllers/notificationController.js
 const { v4: uuidv4 } = require("uuid");
 const { getConnection } = require("../config/dbConfig");
 const { io } = require("../socket-io/socketIo");
@@ -97,7 +97,7 @@ const updateNotification = async (req, res) => {
       reserva: JSON.parse(rows[0].reserva),
     };
 
-     io.emit("notificationUpdated", updatedNotification);
+    io.emit("notificationUpdated", updatedNotification);
 
     res.json(updatedNotification);
   } catch (err) {

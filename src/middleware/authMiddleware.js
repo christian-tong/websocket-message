@@ -1,3 +1,4 @@
+//./src/middleware/authMiddleware.js
 const { verifyToken } = require("../services/authService");
 
 const authenticate = (req, res, next) => {

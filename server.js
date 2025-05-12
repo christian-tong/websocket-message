@@ -1,16 +1,16 @@
-// server.js
+// ./server.js
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { createServer } = require("http");
-const authRoutes = require("./routes/authRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
+const authRoutes = require("./src/routes/authRoutes");
+const notificationRoutes = require("./src/routes/notificationRoutes");
 const allowedOrigins = require("./corsConfig");
 const {
   io,
   app,
   httpServer,
   activeConnections,
-} = require("./socket-io/socketIo");  // Asegúrate de importar correctamente
+} = require("./src/socket-io/socketIo"); // Asegúrate de importar correctamente
 
 require("dotenv").config();
 
@@ -36,8 +36,8 @@ app.use((err, req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use(notificationRoutes);
 
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
 });
 
 // Iniciar el servidor

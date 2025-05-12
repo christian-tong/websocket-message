@@ -1,8 +1,8 @@
-// socket.js
+//./src/socket-io/socketIo.js
 const { Server } = require("socket.io");
 const express = require("express");
 const { createServer } = require("http");
-const allowedOrigins = require("../corsConfig");
+const allowedOrigins = require("../../corsConfig");
 const { verifyToken } = require("../services/authService"); // Importar el verificador de tokens
 
 const app = express();

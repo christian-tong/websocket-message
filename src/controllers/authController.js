@@ -1,3 +1,4 @@
+//./src/controllers/authController.js
 const { login, register } = require("../services/authService");
 const { io, activeConnections } = require("../socket-io/socketIo");
 
