@@ -1,3 +1,4 @@
+//./src/utils/formatDate.js
 const getFormattedTimestamp = () => {
   const ahoraUTC = new Date();
   const offsetPeru = -5 * 60 * 60 * 1000;
