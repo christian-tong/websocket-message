@@ -12,35 +12,51 @@ const {
   activeConnections,
 } = require("./src/socket-io/socketIo"); // Asegúrate de importar correctamente
 
-require("dotenv").config();
-
+// Definir el puerto del servidor
 const PORT = process.env.PORT || 3000;
 
-// Configuración CORS
+/**
+ * Configura y habilita CORS (Cross-Origin Resource Sharing) para permitir el acceso desde ciertos orígenes.
+ * @param {Object} corsOptions - Opciones para la configuración de CORS.
+ */
 app.use(
   cors({
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PATCH"],
-    credentials: true,
+    origin: allowedOrigins, // Permite orígenes definidos en el archivo de configuración de CORS
+    methods: ["GET", "POST", "PATCH"], // Métodos permitidos
+    credentials: true, // Permite el uso de cookies
   })
 );
+
+// Usamos body-parser para parsear el cuerpo de las solicitudes como JSON
 app.use(bodyParser.json());
 
-// Manejo de errores global
+/**
+ * Middleware para manejo de errores global en el servidor.
+ * Si ocurre un error no manejado, responde con el error.
+ */
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send({ error: "Algo salió mal en el servidor" });
 });
 
-// Rutas de autenticación y notificaciones
-app.use("/api/auth", authRoutes);
-app.use(notificationRoutes);
+/**
+ * Rutas para autenticación y notificaciones
+ * /api/auth - Maneja el login y registro de usuarios
+ * /api/notifications - Maneja las operaciones de notificaciones
+ */
+app.use("/api/auth", authRoutes); // Ruta para autenticación
+app.use(notificationRoutes); // Ruta para notificaciones
 
+/**
+ * Ruta para comprobar la salud del servidor (útil para monitoreo)
+ */
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
-// Iniciar el servidor
+/**
+ * Inicia el servidor HTTP en el puerto definido.
+ */
 httpServer.listen(PORT, () => {
   console.log("Servidor corriendo en el puerto", PORT);
 });

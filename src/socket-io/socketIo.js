@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const { createServer } = require("http");
 const allowedOrigins = require("../../corsConfig");
-const { verifyToken } = require("../services/authService"); // Importar el verificador de tokens
+const { verifyToken } = require("../services/authService");
 
 const app = express();
 const httpServer = createServer(app);
@@ -11,32 +11,40 @@ const httpServer = createServer(app);
 // Mapa para almacenar las conexiones activas (userID -> socket)
 const activeConnections = new Map();
 
+// Configuración del servidor Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST", "PATCH"],
-    credentials: true,
+    origin: allowedOrigins, // Orígenes permitidos definidos en corsConfig
+    methods: ["GET", "POST", "PATCH"], // Métodos HTTP permitidos
+    credentials: true, // Permite el uso de cookies
   },
 });
 
-// Middleware de autenticación para Socket.IO
+/**
+ * Middleware para autenticar conexiones de Socket.IO.
+ * @param {Object} socket - Objeto de socket de la conexión.
+ * @param {Function} next - Función para continuar con el flujo de conexión.
+ */
 io.use(async (socket, next) => {
   try {
-    const token = socket.handshake.auth.token;
+    const token = socket.handshake.auth.token; // Extraemos el token desde el handshake
     if (!token) {
       throw new Error("Token no proporcionado");
     }
 
-    // Verificar el token JWT
-    const decoded = verifyToken(token);
-    socket.userId = decoded.userId;
-    next();
+    const decoded = verifyToken(token); // Verificamos el token JWT
+    socket.userId = decoded.userId; // Almacenamos el userId en el socket
+    next(); // Continuamos con la conexión
   } catch (error) {
     console.error("Error de autenticación:", error.message);
     next(new Error("Autenticación fallida"));
   }
 });
 
+/**
+ * Evento que maneja la conexión de un nuevo usuario.
+ * @param {Object} socket - El objeto de socket de la nueva conexión.
+ */
 io.on("connection", (socket) => {
   const userId = socket.userId;
 
@@ -46,39 +54,28 @@ io.on("connection", (socket) => {
   if (activeConnections.has(userId)) {
     const previousSocket = activeConnections.get(userId);
 
-    // Evitar la desconexión de una sesión previa si ya se está desconectando
-    if (previousSocket.disconnected) {
-      console.log(
-        `La sesión anterior ya está desconectada para el usuario: ${userId}`
-      );
-    } else {
-      console.log(`Desconectando sesión previa para usuario: ${userId}`);
+    if (!previousSocket.disconnected) {
+      console.log(`Desconectando sesión anterior para usuario: ${userId}`);
       previousSocket.disconnect(true);
       previousSocket.emit("force_disconnect", "Nueva sesión detectada");
     }
   }
 
-  // Almacenar la nueva conexión
+  // Almacena la nueva conexión
   activeConnections.set(userId, socket);
   console.log(
     `Usuario ${userId} conectado (${activeConnections.size} usuarios activos)`
   );
 
-  // Manejar desconexión
   socket.on("disconnect", (reason) => {
-    if (activeConnections.get(userId) === socket) {
-      activeConnections.delete(userId);
-      console.log(`Usuario ${userId} desconectado. Razón: ${reason}`);
-    }
+    activeConnections.delete(userId); // Elimina la conexión al desconectarse
+    console.log(`Usuario ${userId} desconectado. Razón: ${reason}`);
   });
 
-  // Manejar errores
   socket.on("error", (error) => {
     console.error(`Error en socket para usuario ${userId}:`, error);
   });
 });
 
-// Exportar el mapa de conexiones para acceso desde otros módulos
-io.activeConnections = activeConnections;
-
+// Exportar la instancia de Socket.IO y el mapa de conexiones activas
 module.exports = { io, app, httpServer, activeConnections };

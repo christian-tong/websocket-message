@@ -4,34 +4,44 @@ const { getConnection } = require("../config/dbConfig");
 const { io } = require("../socket-io/socketIo");
 const getFormattedTimestamp = require("../utils/formatDate");
 
-// Obtener todas las notificaciones
+/**
+ * Obtiene todas las notificaciones de la base de datos.
+ * @param {Object} req - Objeto de solicitud (no requiere parámetros).
+ * @param {Object} res - Objeto de respuesta (contiene el listado de notificaciones).
+ */
 const getNotifications = async (req, res) => {
   try {
     const connection = await getConnection();
     const [rows] = await connection.execute("SELECT * FROM notifications");
+
+    // Formateamos las notificaciones
     const formattedNotifications = rows.map((row) => ({
       id: row.id,
       message: row.message,
-      data: JSON.parse(row.data),
-      reserva: JSON.parse(row.reserva),
+      data: JSON.parse(row.data), // Parseamos los datos JSON
+      reserva: JSON.parse(row.reserva), // Parseamos los datos de reserva
       status: row.status,
       timestamp: row.timestamp,
       created_at: row.created_at,
       updated_at: row.updated_at,
     }));
 
-    res.json(formattedNotifications);
+    res.json(formattedNotifications); // Devolvemos las notificaciones formateadas
   } catch (err) {
-    console.error("Database error:", err);
+    console.error("Error al obtener notificaciones:", err);
     res.status(500).json({ error: "Error al obtener notificaciones" });
   }
 };
 
-// Crear una nueva notificación
+/**
+ * Crea una nueva notificación en la base de datos y emite un evento a través de Socket.IO.
+ * @param {Object} req - Objeto de solicitud (contiene los datos de la notificación).
+ * @param {Object} res - Objeto de respuesta (contiene la notificación creada).
+ */
 const createNotification = async (req, res) => {
   const { message, data, reserva } = req.body;
   const timestamp = getFormattedTimestamp();
-  const id = uuidv4(); // Genera un nuevo UUID
+  const id = uuidv4(); // Generamos un nuevo UUID para la notificación
 
   try {
     const connection = await getConnection();
@@ -43,9 +53,9 @@ const createNotification = async (req, res) => {
     await connection.execute(query, [
       id,
       message,
-      JSON.stringify(data),
+      JSON.stringify(data), // Convertimos los datos a string
       JSON.stringify(reserva),
-      "pending",
+      "pending", // Estado inicial de la notificación
       timestamp,
       timestamp,
       timestamp,
@@ -62,16 +72,21 @@ const createNotification = async (req, res) => {
       updated_at: timestamp,
     };
 
+    // Emitimos un evento a través de Socket.IO para notificar a los clientes
     io.emit("newNotification", newNotification);
 
-    res.status(201).json(newNotification);
+    res.status(201).json(newNotification); // Respondemos con la notificación creada
   } catch (err) {
-    console.error("Database error:", err);
+    console.error("Error al crear notificación:", err);
     res.status(500).json({ error: "Error al crear notificación" });
   }
 };
 
-// Actualizar el estado de una notificación
+/**
+ * Actualiza el estado de una notificación existente en la base de datos.
+ * @param {Object} req - Objeto de solicitud (contiene el ID de la notificación y el nuevo estado).
+ * @param {Object} res - Objeto de respuesta (contiene la notificación actualizada).
+ */
 const updateNotification = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -87,6 +102,7 @@ const updateNotification = async (req, res) => {
       return res.status(404).json({ error: "Notificación no encontrada" });
     }
 
+    // Recuperamos la notificación actualizada
     const [rows] = await connection.execute(
       "SELECT * FROM notifications WHERE id = ?",
       [id]
@@ -97,11 +113,12 @@ const updateNotification = async (req, res) => {
       reserva: JSON.parse(rows[0].reserva),
     };
 
+    // Emitimos un evento a través de Socket.IO para notificar a los clientes
     io.emit("notificationUpdated", updatedNotification);
 
-    res.json(updatedNotification);
+    res.json(updatedNotification); // Respondemos con la notificación actualizada
   } catch (err) {
-    console.error("Database error:", err);
+    console.error("Error al actualizar notificación:", err);
     res.status(500).json({ error: "Error al actualizar notificación" });
   }
 };

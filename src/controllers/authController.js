@@ -2,31 +2,36 @@
 const { login, register } = require("../services/authService");
 const { io, activeConnections } = require("../socket-io/socketIo");
 
-// Controlador para el registro de usuario
+/**
+ * Controlador para el registro de un nuevo usuario.
+ * @param {Object} req - Objeto de solicitud (contiene los datos de registro).
+ * @param {Object} res - Objeto de respuesta (se devuelve el resultado de la operación).
+ */
 const registerUser = async (req, res) => {
   try {
-    // Validamos los datos de entrada
     const { username, password } = req.body;
 
-    // Comprobamos si los campos están presentes
     if (!username || !password) {
       return res.status(400).json({ error: "Faltan credenciales" });
     }
 
-    // Llamamos al servicio de registro
     const user = await register(username, password);
 
-    // Respondemos con el usuario creado
+    // Devolvemos solo el username por seguridad
     res.status(201).json({
       message: "Usuario registrado con éxito",
-      user: { username: user.username }, // Solo devolvemos el username por razones de seguridad
+      user: { username: user.username },
     });
   } catch (error) {
-    // Manejo de errores
     res.status(500).json({ error: error.message });
   }
 };
 
+/**
+ * Controlador para el login de un usuario.
+ * @param {Object} req - Objeto de solicitud (contiene las credenciales del usuario).
+ * @param {Object} res - Objeto de respuesta (contiene el token y la respuesta de autenticación).
+ */
 const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -54,4 +59,4 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser, registerUser }; // Correctamente exportamos loginUser
+module.exports = { loginUser, registerUser };
