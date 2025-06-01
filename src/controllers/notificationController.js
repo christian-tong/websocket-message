@@ -88,21 +88,37 @@ const createNotification = async (req, res) => {
  * @param {Object} res - Objeto de respuesta (contiene la notificación actualizada).
  */
 const updateNotification = async (req, res) => {
+  const userId = req.userId || "Usuario no identificado"; // si tienes userId del token
   const { id } = req.params;
   const { status } = req.body;
   const updatedAt = new Date().toISOString();
 
+  console.log(
+    `[${new Date().toISOString()}] Usuario ${userId} intenta actualizar notificación ${id} con estado '${status}'`
+  );
+
   try {
     const connection = await getConnection();
+
+    console.log(
+      `[${new Date().toISOString()}] Usuario ${userId} obteniendo conexión a BD para actualizar notificación`
+    );
+
     const query =
       "UPDATE notifications SET status = ?, updated_at = ? WHERE id = ?";
     const [result] = await connection.execute(query, [status, updatedAt, id]);
 
     if (result.affectedRows === 0) {
+      console.warn(
+        `[${new Date().toISOString()}] Usuario ${userId} intentó actualizar notificación inexistente ${id}`
+      );
       return res.status(404).json({ error: "Notificación no encontrada" });
     }
 
-    // Recuperamos la notificación actualizada
+    console.log(
+      `[${new Date().toISOString()}] Usuario ${userId} actualizó notificación ${id} correctamente`
+    );
+
     const [rows] = await connection.execute(
       "SELECT * FROM notifications WHERE id = ?",
       [id]
@@ -113,12 +129,17 @@ const updateNotification = async (req, res) => {
       reserva: JSON.parse(rows[0].reserva),
     };
 
-    // Emitimos un evento a través de Socket.IO para notificar a los clientes
+    console.log(
+      `[${new Date().toISOString()}] Usuario ${userId} emitiendo evento 'notificationUpdated' para notificación ${id}`
+    );
     io.emit("notificationUpdated", updatedNotification);
 
-    res.json(updatedNotification); // Respondemos con la notificación actualizada
+    res.json(updatedNotification);
   } catch (err) {
-    console.error("Error al actualizar notificación:", err);
+    console.error(
+      `[${new Date().toISOString()}] ERROR Usuario ${userId} al actualizar notificación ${id}:`,
+      err
+    );
     res.status(500).json({ error: "Error al actualizar notificación" });
   }
 };

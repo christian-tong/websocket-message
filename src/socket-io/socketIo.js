@@ -47,33 +47,41 @@ io.use(async (socket, next) => {
  */
 io.on("connection", (socket) => {
   const userId = socket.userId;
+  console.log(`[${new Date().toISOString()}] Usuario conectado: ${userId}`);
 
-  console.log(`Nueva conexión para usuario: ${userId}`);
-
-  // Verifica si el usuario ya tiene una conexión activa
   if (activeConnections.has(userId)) {
-    const previousSocket = activeConnections.get(userId);
-
-    if (!previousSocket.disconnected) {
-      console.log(`Desconectando sesión anterior para usuario: ${userId}`);
-      previousSocket.disconnect(true);
-      previousSocket.emit("force_disconnect", "Nueva sesión detectada");
+    const prevSocket = activeConnections.get(userId);
+    if (!prevSocket.disconnected) {
+      console.log(
+        `[${new Date().toISOString()}] Usuario ${userId} tenía sesión previa, se desconecta.`
+      );
+      prevSocket.disconnect(true);
+      prevSocket.emit("force_disconnect", "Nueva sesión detectada");
     }
   }
 
-  // Almacena la nueva conexión
   activeConnections.set(userId, socket);
   console.log(
-    `Usuario ${userId} conectado (${activeConnections.size} usuarios activos)`
+    `[${new Date().toISOString()}] Usuarios activos: ${activeConnections.size}`
   );
 
   socket.on("disconnect", (reason) => {
-    activeConnections.delete(userId); // Elimina la conexión al desconectarse
-    console.log(`Usuario ${userId} desconectado. Razón: ${reason}`);
+    console.log(
+      `[${new Date().toISOString()}] Usuario ${userId} desconectado. Razón: ${reason}`
+    );
+    if (activeConnections.get(userId) === socket) {
+      activeConnections.delete(userId);
+      console.log(
+        `[${new Date().toISOString()}] Usuario ${userId} removido de conexiones activas.`
+      );
+    }
   });
 
   socket.on("error", (error) => {
-    console.error(`Error en socket para usuario ${userId}:`, error);
+    console.error(
+      `[${new Date().toISOString()}] Error en socket usuario ${userId}:`,
+      error
+    );
   });
 });
 

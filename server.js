@@ -1,4 +1,20 @@
 // ./server.js
+
+require("dotenv").config();
+
+// Manejadores globales para evitar que el servidor se bloquee por errores no capturados o promesas rechazadas
+process.on("uncaughtException", (err) => {
+  console.error(
+    `[${new Date().toISOString()}] Excepción no capturada:`,
+    err.stack
+  );
+  // No cerramos el servidor automáticamente para evitar cuelgues en producción
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error(`[${new Date().toISOString()}] Promesa no manejada:`, reason);
+});
+
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { createServer } = require("http");
